@@ -259,5 +259,13 @@ function restartQuiz(){startQuiz(activeChapter)}
 function goHome(){$("quiz").style.display="none";$("result").style.display="none";$("home").style.display="block";window.scrollTo(0,0)}
 renderChapters();
 </script>
+ <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .catch(err => console.log("Service worker registration failed:", err));
+  });
+}
+ </script>
 </body>
 </html>
