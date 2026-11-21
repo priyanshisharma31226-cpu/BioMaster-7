@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123d2c">
+<title>BioMaster 7 | ICSE Biology</title>
+<style>
+:root{--green:#123d2c;--green2:#1d6244;--gold:#e9c46a;--cream:#f5f7ef;--ink:#193329;--muted:#66766d;--white:#fff;--red:#b83b3b}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:linear-gradient(135deg,#0b2b20,#1e6848);color:white;padding:24px 18px 30px;border-radius:0 0 28px 28px}
+.top{max-width:1000px;margin:auto;display:flex;align-items:center;gap:14px}
+.logo{width:58px;height:58px;border:2px solid var(--gold);border-radius:18px;display:grid;place-items:center;font-size:30px;background:#ffffff12}
+h1{font-size:25px;margin:0 0 5px}header p{margin:0;color:#d9e9df;font-size:13px}
+main{max-width:1000px;margin:20px auto;padding:0 14px 40px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:-4px}
+.stat,.panel,.chapter{background:white;border-radius:16px;padding:15px;box-shadow:0 4px 16px #143a2810}
+.stat b{display:block;font-size:21px;color:var(--green)}.stat span{font-size:11px;color:var(--muted)}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 12px}
+.section-title h2{font-size:18px;margin:0}.section-title small{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.chapter{border:1px solid #e4ebe5;cursor:pointer;transition:.2s;text-align:left;color:var(--ink);width:100%}
+.chapter:hover{transform:translateY(-2px);border-color:#8bb59c}
+.ch-head{display:flex;gap:10px;align-items:center}.ch-icon{width:42px;height:42px;border-radius:13px;background:#e8f3eb;display:grid;place-items:center;font-size:23px}
+.chapter h3{font-size:14px;margin:0 0 4px}.chapter p{font-size:12px;color:var(--muted);margin:0}
+.ch-meta{display:flex;justify-content:space-between;margin-top:14px;font-size:11px;color:var(--green2);font-weight:bold}
+button{font:inherit}.primary,.secondary{border:0;border-radius:12px;padding:12px 16px;font-weight:bold;cursor:pointer}
+.primary{background:var(--green2);color:white}.secondary{background:#e8f1ea;color:var(--green)}
+#quiz{display:none}.quiz-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
+.back{background:none;border:0;color:var(--green2);font-weight:bold;cursor:pointer;padding:8px 0}
+.progress{height:8px;background:#e5ece6;border-radius:20px;overflow:hidden;margin:10px 0 18px}.bar{height:100%;background:#2b8a5b;width:0%;transition:.2s}
+.q-meta{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.question{font-size:19px;line-height:1.4;margin:12px 0 18px;font-weight:700}
+.options{display:grid;gap:10px}.option{width:100%;text-align:left;padding:14px;border:1px solid #dce6dd;border-radius:13px;background:white;color:var(--ink);cursor:pointer;font-size:14px}
+.option:disabled{cursor:default}.option.correct{border-color:#26945e;background:#e8f7ed}.option.wrong{border-color:#c64c4c;background:#fff0ef}
+.feedback{display:none;margin-top:14px;padding:14px;border-radius:13px;background:#edf5ef;font-size:13px;line-height:1.5}.feedback.show{display:block}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.result{text-align:center;padding:24px 12px}.score{font-size:44px;color:var(--green2);font-weight:800}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+@media(max-width:520px){h1{font-size:21px}.stat{padding:12px}.question{font-size:17px}.stats{gap:7px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="logo">🧬</div><div><h1>BioMaster 7</h1><p>ICSE Class 7 Biology • Learn • Practise • Excel</p></div></div></header>
+<main>
+<div class="stats">
+ <div class="stat"><b id="chapterCount">7</b><span>CHAPTERS</span></div>
+ <div class="stat"><b>140</b><span>MCQ QUESTIONS</span></div>
+ <div class="stat"><b>20</b><span>MINIMUM PER CHAPTER</span></div>
+</div>
+<section id="home">
+ <div class="section-title"><h2>Choose a chapter</h2><small>20 questions each</small></div>
+ <div class="grid" id="chapterGrid"></div>
+</section>
+<section id="quiz">
+ <button class="back" onclick="goHome()">← All chapters</button>
+ <div class="panel">
+  <div class="quiz-head"><strong id="quizTitle">Chapter</strong><span id="scoreLabel">Score: 0</span></div>
+  <div class="q-meta"><span id="questionNumber">Question 1 of 20</span><span id="answeredLabel">Choose an answer</span></div>
+  <div class="progress"><div class="bar" id="progressBar"></div></div>
+  <div class="question" id="questionText"></div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+  <div class="actions"><button class="secondary" onclick="goHome()">Exit quiz</button><button class="primary" id="nextBtn" onclick="nextQuestion()" disabled>Next question →</button></div>
+ </div>
+</section>
+<section id="result" style="display:none"><div class="panel result"><div style="font-size:42px">🏆</div><h2>Quiz completed!</h2><div class="score" id="finalScore">0/20</div><p id="resultMessage"></p><button class="primary" onclick="restartQuiz()">Try again</button> <button class="secondary" onclick="goHome()">All chapters</button></div></section>
+</main>
+<footer>BioMaster 7 • Original practice questions for learning. Follow your school's prescribed textbook and syllabus.</footer>
+<script>
+const chapters = [
+{title:"Plant and Animal Tissues",icon:"🌿",questions:[
+["A group of similar cells performing a common function is called a…","Tissue",["Organ","Organ system","Organism"],"A tissue is a group of similar cells that work together to perform a particular function."],
+["Which plant tissue is responsible for growth in length?","Apical meristem",["Parenchyma","Sclerenchyma","Phloem"],"Apical meristems occur at root and shoot tips and increase the length of the plant."],
+["Meristematic cells are generally…","Actively dividing",["Dead and hollow","Filled with air spaces","Unable to divide"],"Meristematic cells divide repeatedly and help plants grow."],
+["Which tissue transports water in plants?","Xylem",["Phloem","Epidermis","Collenchyma"],"Xylem conducts water and dissolved minerals from roots to other parts."],
+["Which tissue transports prepared food in plants?","Phloem",["Xylem","Sclerenchyma","Cork"],"Phloem transports sugars and other food substances around the plant."],
+["Which simple permanent tissue commonly stores food?","Parenchyma",["Sclerenchyma","Xylem vessel","Phloem fibre"],"Parenchyma consists of living cells and often stores food and water."],
+["Which plant tissue provides flexible support to young stems?","Collenchyma",["Parenchyma","Sclerenchyma","Phloem"],"Collenchyma has unevenly thickened cell walls and provides flexible support."],
+["Sclerenchyma cells are usually…","Dead at maturity",["Actively dividing","Without cell walls","Always soft"],"Sclerenchyma cells generally have thick, lignified walls and are dead at maturity."],
+["The outer protective covering of a young plant part is often…","Epidermis",["Phloem","Cambium","Pith"],"The epidermis forms the outer protective layer of many plant organs."],
+["Which animal tissue covers body surfaces and lines organs?","Epithelial tissue",["Muscular tissue","Nervous tissue","Blood"],"Epithelial tissue covers surfaces and lines internal organs and cavities."],
+["Which tissue joins muscle to bone?","Tendon",["Ligament","Cartilage","Areolar tissue"],"A tendon connects a muscle to a bone."],
+["Which tissue connects one bone to another?","Ligament",["Tendon","Blood","Adipose tissue"],"Ligaments connect bones at joints and help stabilise them."],
+["Which connective tissue stores fat?","Adipose tissue",["Cartilage","Blood","Bone"],"Adipose tissue stores fat and also helps insulate the body."],
+["Which tissue forms the framework of the body?","Bone",["Blood","Epithelial tissue","Areolar tissue"],"Bone is a hard connective tissue that supports and protects the body."],
+["Which tissue is found at the ends of bones in movable joints?","Cartilage",["Adipose tissue","Blood","Nervous tissue"],"Cartilage provides a smooth, flexible surface and reduces friction at joints."],
+["Blood is classified as a…","Connective tissue",["Muscular tissue","Epithelial tissue","Meristematic tissue"],"Blood is a fluid connective tissue that transports materials throughout the body."],
+["Which muscle type is generally under conscious control?","Striated muscle",["Smooth muscle","Cardiac muscle","All involuntary muscle"],"Skeletal or striated muscles are usually voluntary and help move the skeleton."],
+["Which muscle tissue is found in the wall of the intestine?","Smooth muscle",["Striated muscle","Cardiac muscle","Bone tissue"],"Smooth muscles work involuntarily in organs such as the intestine."],
+["Which muscle is found only in the heart?","Cardiac muscle",["Smooth muscle","Skeletal muscle","Adipose tissue"],"Cardiac muscle contracts rhythmically to pump blood."],
+["Which tissue carries messages in the body?","Nervous tissue",["Epithelial tissue","Adipose tissue","Sclerenchyma"],"Nervous tissue contains cells specialised to receive and transmit impulses."]
+]},
+{title:"Classification of Plants",icon:"🌱",questions:[
+["The science of grouping organisms based on similarities is…","Classification",["Respiration","Nutrition","Excretion"],"Classification arranges organisms into groups using shared features."],
+["Plants that do not produce flowers are commonly called…","Non-flowering plants",["Mammals","Flowering plants","Insects"],"Non-flowering plants reproduce without producing flowers."],
+["Which group includes mosses?","Bryophytes",["Gymnosperms","Angiosperms","Fungi"],"Mosses are bryophytes; they are small plants that usually need moist places."],
+["Which group has vascular tissues but no seeds?","Pteridophytes",["Bryophytes","Algae","Angiosperms"],"Ferns are pteridophytes and reproduce by spores rather than seeds."],
+["Fern plants reproduce mainly by…","Spores",["Fruits","Cones","Flowers"],"Ferns produce spores, commonly on the underside of their fronds."],
+["Plants with naked seeds are called…","Gymnosperms",["Angiosperms","Bryophytes","Algae"],"Gymnosperms bear seeds that are not enclosed inside fruits."],
+["Which is an example of a gymnosperm?","Pine",["Mango","Pea","Rose"],"Pine bears cones and has naked seeds."],
+["Seeds enclosed within fruits are characteristic of…","Angiosperms",["Gymnosperms","Mosses","Ferns"],"Angiosperms are flowering plants whose seeds develop inside fruits."],
+["Which plant group produces flowers?","Angiosperms",["Bryophytes","Pteridophytes","Algae"],"Angiosperms are flowering plants."],
+["A plant with one cotyledon is a…","Monocot",["Dicot","Moss","Fern"],"Monocot seeds contain one cotyledon or seed leaf."],
+["A bean seed is generally a…","Dicot",["Monocot","Gymnosperm cone","Spore"],"Bean seeds typically have two cotyledons."],
+["Parallel leaf venation is common in…","Monocots",["Dicots","Mosses","Ferns only"],"Many monocot plants, such as grasses, have parallel leaf veins."],
+["Reticulate leaf venation is common in…","Dicots",["Monocots","Mosses","Algae"],"Dicot leaves commonly show a net-like pattern of veins."],
+["Fibrous roots are commonly found in…","Monocots",["Dicots","Pine trees only","Mosses"],"Many monocots, including grasses, have fibrous root systems."],
+["A taproot system is commonly found in…","Dicots",["Monocots","Mosses","Algae"],"Many dicots develop a main taproot with smaller lateral roots."],
+["Which plant body is not differentiated into true roots, stems and leaves?","Thallus",["Flower","Fruit","Seed"],"In many algae, the body is a simple thallus rather than true roots, stems and leaves."],
+["Algae are generally found in…","Aquatic habitats",["Deserts only","Dry rocks only","Inside bones"],"Most algae live in water or damp environments."],
+["Which of these is a bryophyte?","Moss",["Mango","Pine","Fern"],"Moss is a bryophyte and lacks the well-developed vascular system of higher plants."],
+["Which plant group includes horsetails and ferns?","Pteridophytes",["Bryophytes","Gymnosperms","Angiosperms"],"Ferns and horsetails are examples of pteridophytes."],
+["The main purpose of plant classification is to…","Study and identify plants systematically",["Make plants grow faster","Change plant colour","Stop reproduction"],"Classification makes the study, comparison and identification of plants easier."]
+]},
+{title:"Classification of Animals",icon:"🦋",questions:[
+["Animals with a backbone are called…","Vertebrates",["Invertebrates","Protozoans","Arthropods"],"Vertebrates possess a vertebral column or backbone."],
+["Animals without a backbone are…","Invertebrates",["Mammals","Birds","Reptiles"],"Invertebrates do not have a vertebral column."],
+["Which group has a soft body and usually a shell?","Molluscs",["Arthropods","Annelids","Echinoderms"],"Molluscs have soft bodies; many have a protective shell."],
+["Which feature is typical of arthropods?","Jointed legs",["Backbone","Feathers","Mammary glands"],"Arthropods have jointed appendages and a hard external skeleton."],
+["Earthworm belongs to which group?","Annelida",["Mollusca","Porifera","Cnidaria"],"Earthworms are segmented worms belonging to Annelida."],
+["Starfish belongs to…","Echinodermata",["Annelida","Arthropoda","Mollusca"],"Starfish are marine echinoderms with spiny skin."],
+["Sponges belong to…","Porifera",["Chordata","Mollusca","Annelida"],"Poriferans have numerous pores through which water flows."],
+["Which animal is an amphibian?","Frog",["Lizard","Pigeon","Shark"],"Frogs are amphibians and can live both in water and on land."],
+["Which group has dry scales and is generally cold-blooded?","Reptiles",["Mammals","Birds","Amphibians"],"Reptiles have dry, scaly skin and are ectothermic."],
+["Which group has feathers?","Birds",["Mammals","Reptiles","Fishes"],"Feathers are a defining feature of birds."],
+["Which animals feed their young with milk?","Mammals",["Birds","Fishes","Amphibians"],"Female mammals have mammary glands that produce milk."],
+["Fish generally breathe through…","Gills",["Lungs only","Skin only","Spiracles"],"Gills extract dissolved oxygen from water."],
+["The body of most insects is divided into…","Head, thorax and abdomen",["Head and trunk only","Cephalothorax only","Four equal parts"],"Insects have three main body regions: head, thorax and abdomen."],
+["How many pairs of legs do insects have?","Three pairs",["Two pairs","Four pairs","Five pairs"],"Adult insects typically have six legs arranged in three pairs."],
+["Which animal is a mammal that lays eggs?","Platypus",["Cow","Dog","Whale"],"The platypus is a monotreme, a rare egg-laying mammal."],
+["Which vertebrate group usually has moist skin without scales?","Amphibians",["Reptiles","Birds","Mammals"],"Amphibians generally have moist, glandular skin."],
+["Which is an example of a cartilaginous fish?","Shark",["Rohu","Catla","Goldfish"],"Sharks have skeletons made mainly of cartilage."],
+["Which animal is an invertebrate?","Butterfly",["Frog","Snake","Pigeon"],"A butterfly is an insect and has no backbone."],
+["Which group includes octopus and snail?","Mollusca",["Annelida","Arthropoda","Porifera"],"Octopus and snails are molluscs with soft bodies."],
+["The study of animal classification helps us to…","Understand similarities and relationships",["Turn animals into plants","Stop evolution","Create new species"],"Grouping animals helps scientists identify them and understand relationships."]
+]},
+{title:"Photosynthesis and Respiration",icon:"☀️",questions:[
+["The process by which green plants make food is…","Photosynthesis",["Respiration","Transpiration","Excretion"],"Photosynthesis uses light energy to make food from carbon dioxide and water."],
+["Which green pigment absorbs light for photosynthesis?","Chlorophyll",["Haemoglobin","Melanin","Keratin"],"Chlorophyll in chloroplasts absorbs light energy."],
+["Which gas is taken in during photosynthesis?","Carbon dioxide",["Oxygen","Nitrogen","Hydrogen"],"Plants use carbon dioxide from air as a raw material for photosynthesis."],
+["Which gas is released during photosynthesis?","Oxygen",["Carbon dioxide","Nitrogen","Methane"],"Oxygen is released when water is split during photosynthesis."],
+["The main source of energy for photosynthesis is…","Sunlight",["Moonlight","Soil","Wind"],"Light energy from the Sun drives photosynthesis."],
+["Which part of the plant mainly absorbs water?","Roots",["Flowers","Fruits","Leaves"],"Root hairs absorb water and mineral salts from the soil."],
+["Tiny pores on leaves are called…","Stomata",["Lenticels only","Veins","Petals"],"Stomata allow gaseous exchange and water vapour loss."],
+["The food formed during photosynthesis is initially stored as…","Glucose",["Protein","Fat only","Mineral salt"],"Photosynthesis produces glucose, which can be used or converted into other substances."],
+["Excess glucose in leaves is commonly stored as…","Starch",["Oxygen","Chlorophyll","Water"],"Plants convert some glucose into starch for storage."],
+["Which test is used to detect starch in a leaf?","Iodine test",["Benedict's test","Litmus test","Biuret test"],"Iodine solution turns blue-black in the presence of starch."],
+["Respiration is the process that…","Releases energy from food",["Makes sunlight","Absorbs minerals only","Produces seeds"],"Respiration breaks down food molecules to release usable energy."],
+["Aerobic respiration requires…","Oxygen",["No oxygen","Only nitrogen","Only carbon dioxide"],"Aerobic respiration uses oxygen to release energy from glucose."],
+["Which gas is commonly released in aerobic respiration?","Carbon dioxide",["Oxygen","Nitrogen","Helium"],"Carbon dioxide is produced when glucose is broken down aerobically."],
+["Anaerobic respiration occurs…","Without oxygen",["Only in sunlight","Only in leaves","Only in water"],"Anaerobic respiration releases energy without using oxygen."],
+["Yeast can produce alcohol during…","Anaerobic respiration",["Photosynthesis","Transpiration","Digestion"],"Yeast fermentation produces alcohol and carbon dioxide in the absence of oxygen."],
+["Which process occurs in both plants and animals?","Respiration",["Photosynthesis","Pollination","Seed formation"],"All living cells respire to release energy."],
+["Photosynthesis mainly takes place in…","Chloroplasts",["Mitochondria","Nucleus","Ribosomes"],"Chloroplasts contain chlorophyll and are the main sites of photosynthesis."],
+["Which factor can limit the rate of photosynthesis?","Light intensity",["Sound intensity","Soil colour only","Wind direction only"],"Light intensity, carbon dioxide and temperature can affect photosynthesis."],
+["Respiration in plants occurs…","Day and night",["Only during daytime","Only at night","Only during rain"],"Plants respire continuously, both during the day and at night."],
+["Which statement is correct?","Photosynthesis stores energy; respiration releases energy",["Both only release energy","Both need no raw materials","Respiration makes glucose from sunlight"],"Photosynthesis stores light energy in food, while respiration releases energy from food."]
+]},
+{title:"Excretion in Humans",icon:"🩺",questions:[
+["Removal of metabolic waste from the body is called…","Excretion",["Digestion","Ingestion","Circulation"],"Excretion removes waste products formed by metabolism."],
+["The main organs that filter blood to form urine are…","Kidneys",["Lungs","Stomach","Heart"],"The kidneys remove urea, excess salts and water from the blood."],
+["The functional filtering units of kidneys are…","Nephrons",["Alveoli","Neurons","Villi"],"Millions of nephrons in the kidneys filter blood and help form urine."],
+["Urine travels from each kidney to the bladder through the…","Ureter",["Urethra","Aorta","Oesophagus"],"The ureters carry urine from the kidneys to the urinary bladder."],
+["Urine is stored temporarily in the…","Urinary bladder",["Kidney","Ureter","Liver"],"The urinary bladder stores urine until it is expelled."],
+["Urine leaves the body through the…","Urethra",["Ureter","Trachea","Oviduct"],"The urethra carries urine from the bladder to the outside."],
+["The major nitrogenous waste in human urine is…","Urea",["Glucose","Oxygen","Starch"],"The liver forms urea from excess amino-acid breakdown products; kidneys remove it."],
+["Urea is formed mainly in the…","Liver",["Kidney","Lungs","Bladder"],"The liver converts toxic ammonia into less toxic urea."],
+["Which organ removes carbon dioxide from the blood?","Lungs",["Stomach","Bladder","Pancreas"],"Carbon dioxide diffuses from blood into the lungs and is exhaled."],
+["Sweat is produced by…","Sweat glands",["Salivary glands","Thyroid gland","Tear glands"],"Sweat glands in the skin produce sweat containing water and salts."],
+["Sweating helps the body to…","Cool down",["Digest proteins","Make red blood cells","Store oxygen"],"Evaporation of sweat removes heat and helps regulate body temperature."],
+["Which of these is normally present in urine?","Water",["Starch","Undigested cellulose","Large amounts of protein"],"Normal urine contains water, urea and dissolved salts."],
+["The kidneys help maintain the balance of…","Water and salts",["Bones and muscles only","Light and heat","Sound and pressure"],"Kidneys regulate water and salt levels as well as remove wastes."],
+["A tube that carries urine is part of the…","Urinary system",["Digestive system","Respiratory system","Skeletal system"],"Kidneys, ureters, bladder and urethra form the urinary system."],
+["A kidney stone is a hard deposit formed from…","Minerals and salts",["Starch and sugar","Air bubbles","Muscle fibres"],"Kidney stones can form when certain minerals and salts crystallise in urine."],
+["A urinary tract infection commonly affects the…","Urinary system",["Nervous system","Skeletal system","Endocrine system"],"A UTI is an infection in parts of the urinary tract."],
+["Which habit supports urinary health?","Drinking adequate clean water",["Avoiding water all day","Holding urine for long periods","Taking unknown medicines"],"Adequate hydration supports normal urine production; persistent symptoms need medical advice."],
+["Which organ is also an excretory organ because it releases carbon dioxide?","Lungs",["Stomach","Pancreas","Small intestine"],"The lungs remove carbon dioxide, a waste product of cellular respiration."],
+["Which organ removes urea from the blood?","Kidneys",["Heart","Brain","Gall bladder"],"Kidneys filter urea from the blood and excrete it in urine."],
+["What is the correct path of urine?","Kidney → ureter → bladder → urethra",["Bladder → kidney → urethra → ureter","Kidney → urethra → ureter → bladder","Ureter → kidney → bladder → urethra"],"Urine is made in kidneys, carried by ureters, stored in the bladder and passed out through the urethra."]
+]},
+{title:"Nervous System",icon:"🧠",questions:[
+["The nervous system helps the body to…","Control and coordinate activities",["Digest cellulose only","Make food","Transport urine"],"The nervous system receives information and coordinates responses."],
+["The main parts of the central nervous system are…","Brain and spinal cord",["Heart and lungs","Kidneys and bladder","Bones and muscles"],"The central nervous system consists of the brain and spinal cord."],
+["The basic structural and functional unit of the nervous system is…","Neuron",["Nephron","Alveolus","Villus"],"A neuron is a specialised cell that carries nerve impulses."],
+["The part of the brain responsible for thinking and memory is…","Cerebrum",["Cerebellum","Medulla","Spinal nerve"],"The cerebrum is involved in thinking, memory, intelligence and voluntary actions."],
+["Which brain part helps maintain balance and posture?","Cerebellum",["Cerebrum","Medulla oblongata","Hypothalamus"],"The cerebellum coordinates muscle activity and helps maintain balance."],
+["Which part controls involuntary activities such as breathing?","Medulla oblongata",["Cerebrum","Cerebellum","Optic nerve"],"The medulla helps regulate involuntary functions such as breathing and heartbeat."],
+["The spinal cord is protected by the…","Vertebral column",["Rib cage only","Skull only","Pelvis only"],"The vertebral column surrounds and protects the spinal cord."],
+["Nerves carry messages in the form of…","Nerve impulses",["Food particles","Urine","Hormone droplets only"],"Nerve impulses are electrical and chemical signals transmitted by neurons."],
+["A quick automatic response to a stimulus is called a…","Reflex action",["Voluntary action","Digestion","Growth"],"A reflex action is a rapid, automatic response that often protects the body."],
+["Which structure detects a stimulus?","Receptor",["Effector","Tendon","Ligament"],"Receptors detect changes in the internal or external environment."],
+["Muscles that carry out a response are called…","Effectors",["Receptors","Neurons","Stimuli"],"Effectors such as muscles or glands produce the response to a nerve signal."],
+["The long fibre that carries impulses away from a neuron's cell body is…","Axon",["Dendrite","Nucleus","Synapse"],"An axon carries nerve impulses away from the cell body."],
+["Dendrites usually…","Receive impulses",["Make urine","Pump blood","Digest food"],"Dendrites receive signals and carry them towards the neuron's cell body."],
+["The tiny gap between two communicating neurons is a…","Synapse",["Tendon","Alveolus","Joint"],"A synapse is the junction where signals pass from one neuron to another."],
+["Which sense organ detects light?","Eye",["Ear","Nose","Tongue"],"The eye contains light-sensitive cells that enable vision."],
+["Which part of the nervous system connects the brain to many body nerves?","Spinal cord",["Stomach","Kidney","Liver"],"The spinal cord carries messages between the brain and much of the body."],
+["A voluntary action is one that is…","Under conscious control",["Always automatic","Only during sleep","Not controlled by muscles"],"Voluntary actions are consciously controlled, such as writing or walking."],
+["Which is an example of an involuntary action?","Heartbeat",["Writing a sentence","Waving by choice","Picking up a book"],"The heartbeat is regulated automatically and is not normally under conscious control."],
+["The brain is protected by the…","Skull",["Femur","Ribs","Pelvic girdle"],"The skull, or cranium, protects the brain."],
+["A change in the environment that causes a response is called a…","Stimulus",["Effector","Neuron","Synapse"],"A stimulus is a detectable change that can trigger a response."]
+]},
+{title:"Allergy",icon:"🌼",questions:[
+["An allergy is an…","Overreaction of the immune system to a usually harmless substance",["Injury to a bone","Type of digestion","Lack of oxygen"],"An allergy occurs when the immune system reacts strongly to a substance that is usually harmless."],
+["A substance that triggers an allergic reaction is called an…","Allergen",["Antibiotic","Enzyme","Nutrient"],"An allergen is a substance that causes an allergic response in a sensitive person."],
+["Which is a common airborne allergen?","Pollen",["Clean water","Oxygen","Table salt"],"Pollen grains can trigger allergic symptoms in sensitive people."],
+["Dust mites are commonly found in…","House dust and bedding",["Sterile glass","Fresh distilled water","Metal tools"],"Dust mites can live in household dust, mattresses and soft furnishings."],
+["Which symptom commonly occurs in nasal allergy?","Sneezing",["Broken bone","Tooth decay","Dehydration only"],"Allergic rhinitis often causes sneezing, a runny or blocked nose and itchy eyes."],
+["Which of these can be a food allergen?","Peanuts",["Plain water","Oxygen","Glucose made in the body"],"Peanuts are a recognised food allergen for some people."],
+["Seasonal allergies are often linked to…","Pollen released during certain seasons",["A broken arm","Lack of sleep only","A single mosquito bite"],"Seasonal allergic symptoms can occur when particular plants release pollen."],
+["An allergy that can occur throughout the year is called…","Perennial allergy",["Seasonal allergy","Infection","Deficiency disease"],"Perennial allergies may be triggered by year-round allergens such as dust mites."],
+["Which body system is mainly involved in allergic reactions?","Immune system",["Skeletal system","Digestive system only","Muscular system"],"Allergies involve an immune response to an allergen."],
+["Allergens may enter the body through the…","Nose, mouth or skin",["Hair shaft only","Nails only","Bones"],"Allergens can be inhaled, eaten or contact the skin."],
+["Which is a possible skin allergy symptom?","Itchy rash",["Improved eyesight","Stronger bones","Faster hair growth"],"Some allergic reactions cause itching, redness, hives or rashes on the skin."],
+["Which action may help reduce dust-mite exposure?","Wash bedding regularly",["Keep dusty bedding unwashed","Store damp clothes under the bed","Shake dust indoors"],"Regularly washing bedding and reducing dust can lower exposure to dust mites."],
+["If a person has a known food allergy, they should…","Avoid the trigger food and check food labels",["Eat a large amount to build tolerance","Ignore ingredient lists","Share medicines"],"Avoiding the known allergen and checking labels helps prevent reactions."],
+["A severe allergic reaction affecting breathing or circulation is called…","Anaphylaxis",["Common cold","Motion sickness","Sunburn"],"Anaphylaxis is a medical emergency and requires immediate emergency treatment."],
+["Which is the safest response to suspected severe anaphylaxis?","Use prescribed adrenaline auto-injector and seek emergency help",["Wait several hours","Drink only water","Exercise"],"Anaphylaxis needs urgent emergency care; prescribed adrenaline should be used promptly."],
+["Which of these is NOT an allergen?","A normal body cell",["Pollen","Dust mite","Some foods"],"Allergens are external substances such as pollen, mites or certain foods; normal body cells are not typical allergens."],
+["Allergic rhinitis mainly affects the…","Nose",["Kidneys","Bones","Heart valves"],"Allergic rhinitis is an allergic inflammation of the lining of the nose."],
+["Which measure can help during high-pollen days?","Keep windows closed when pollen levels are high",["Roll in grass","Dry clothes outdoors during peak pollen","Rub eyes frequently"],"Reducing exposure to outdoor pollen may help people with seasonal allergies."],
+["Why should a person not take another person's allergy medicine?","The medicine and dose may not be suitable for them",["All medicines are identical","It always causes immunity","It prevents all allergies"],"Medication choice and dose depend on the person; follow advice from a qualified health professional."],
+["Which statement about allergies is correct?","Different people can react to different allergens",["Everyone has the same allergies","All allergies are contagious","All allergies are caused by bacteria"],"Allergies vary between people and are not contagious."]
+]}
+];
+let activeChapter=0, qIndex=0, score=0, answered=false, selectedQuestions=[];
+const $=id=>document.getElementById(id);
+function renderChapters(){
+ $("chapterGrid").innerHTML=chapters.map((c,i)=>`<button class="chapter" onclick="startQuiz(${i})"><div class="ch-head"><div class="ch-icon">${c.icon}</div><div><h3>${i+1}. ${c.title}</h3><p>ICSE Class 7 Biology</p></div></div><div class="ch-meta"><span>20 MCQs</span><span>Start quiz →</span></div></button>`).join("");
+}
+function startQuiz(i){activeChapter=i;qIndex=0;score=0;answered=false;selectedQuestions=chapters[i].questions;$("home").style.display="none";$("result").style.display="none";$("quiz").style.display="block";$("quizTitle").textContent=chapters[i].title;$("scoreLabel").textContent="Score: 0";showQuestion();window.scrollTo(0,0)}
+function showQuestion(){
+ const q=selectedQuestions[qIndex];answered=false;
+ $("questionNumber").textContent=`Question ${qIndex+1} of ${selectedQuestions.length}`;
+ $("answeredLabel").textContent="Choose the correct answer";
+ $("progressBar").style.width=((qIndex)/selectedQuestions.length*100)+"%";
+ $("questionText").textContent=q[0];
+ const opts=[q[1],...q[2]].sort(()=>Math.random()-.5);
+ $("options").innerHTML=opts.map((o,i)=>`<button class="option" onclick="chooseAnswer(this,${JSON.stringify(o).replace(/"/g,'&quot;')})"><b>${String.fromCharCode(65+i)}.</b> ${o}</button>`).join("");
+ $("feedback").className="feedback";$("feedback").textContent="";$("nextBtn").disabled=true;$("nextBtn").textContent=qIndex===selectedQuestions.length-1?"See result →":"Next question →";
+}
+function chooseAnswer(btn,choice){
+ if(answered)return;answered=true;const q=selectedQuestions[qIndex];const correct=q[1];
+ document.querySelectorAll(".option").forEach(b=>{b.disabled=true;const val=b.textContent.replace(/^[A-D]\.\s*/,"");if(val===correct)b.classList.add("correct")});
+ const ok=choice===correct;if(ok)score++;else btn.classList.add("wrong");
+ $("scoreLabel").textContent="Score: "+score;
+ $("answeredLabel").textContent=ok?"Correct answer ✓":"Answer reviewed";
+ $("feedback").className="feedback show";
+ $("feedback").innerHTML=`<strong>${ok?"Correct!":"Not quite. Correct answer: "+correct}</strong><br>${q[3]}`;
+ $("nextBtn").disabled=false;
+}
+function nextQuestion(){if(!answered)return;if(qIndex<selectedQuestions.length-1){qIndex++;showQuestion()}else showResult()}
+function showResult(){$("quiz").style.display="none";$("result").style.display="block";$("finalScore").textContent=score+"/"+selectedQuestions.length;const pct=score/selectedQuestions.length*100;$("resultMessage").textContent=pct>=80?"Excellent work! You have a strong understanding of this chapter.":pct>=50?"Good effort! Review the explanations and try again.":"Keep practising. Read each explanation and give it another try.";window.scrollTo(0,0)}
+function restartQuiz(){startQuiz(activeChapter)}
+function goHome(){$("quiz").style.display="none";$("result").style.display="none";$("home").style.display="block";window.scrollTo(0,0)}
+renderChapters();
+</script>
+</body>
+</html>
