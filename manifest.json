@@ -1,0 +1,19 @@
+
+{
+  "name": "BioMaster 7 - ICSE Biology",
+  "short_name": "BioMaster 7",
+  "description": "Free ICSE Class 7 Biology MCQ Practice",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7ef",
+  "theme_color": "#123d2c",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
